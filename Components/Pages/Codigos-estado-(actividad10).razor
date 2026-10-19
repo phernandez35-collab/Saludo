@@ -1,0 +1,47 @@
+﻿@page "/Actividad10"
+@rendermode InteractiveServer
+
+<div class="row mb-3">
+    <div class="col-6">
+        <label for="CodigoInput" class="form-label">Ingresa un Codigo:</label>
+        <input id="CodigoInput" type="number" class="form-control" min="0" @bind="Codigo" />
+    </div>
+</div>
+
+<button class="btn btn-primary" @onclick="Evaluar">Evaluar Codigo</button>
+
+<div class="alert @Color">
+    <h2>@Mensaje</h2>
+</div>
+
+@code {
+    [Parameter]
+    public string? Mensaje { get; set; } = "Ingresa un Codigo para evaluar";
+
+    private int Codigo;
+    private string Color = "alert-info";
+
+    private void Evaluar()
+    {
+        if (Codigo == 200)
+        {
+            Mensaje = "SISTEMA OPERACIONAL";
+            Color = "alert-success";
+        }
+        else if (Codigo == 404)
+        {
+            Mensaje = "RECURSO NO ENCONTRADO";
+            Color = "alert-warning";
+        }
+        else if (Codigo == 500)
+        {
+            Mensaje = "ERROR INTERNO DEL SERVIDOR";
+            Color = "alert-danger";
+        }
+        else
+        {
+            Mensaje = "ESTADO DESCONOCIDO";
+            Color = "alert-secondary";
+        }
+    }
+}

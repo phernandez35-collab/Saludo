@@ -1,0 +1,508 @@
+﻿@page "/segunda-parcial-3b"
+@rendermode InteractiveServer
+@using System.Collections.Generic
+
+<PageTitle>Registro de productos</PageTitle>
+
+<div id="aplicacion">
+    <aside id="barra-lateral">
+        <div id="nombre-aplicacion">Inventario 3B</div>
+        <nav aria-label="Navegación principal">
+            <div id="opcion-activa">Registro de productos</div>
+            <button id="boton-inventario" type="button" @onclick="MostrarListaCompleta">Inventario en memoria</button>
+        </nav>
+    </aside>
+
+    <main id="contenido">
+        <header>
+            <p id="sobre-titulo">SEGUNDA PARCIAL</p>
+            <h1>Registro de productos</h1>
+            <p id="introduccion">Captura productos y consulta el inventario por departamento.</p>
+        </header>
+
+        <section id="formulario" aria-labelledby="titulo-formulario">
+            <h2 id="titulo-formulario">Datos del producto</h2>
+
+            <div id="campos">
+                <div>
+                    <label for="numero-inventario">No. de inventario</label>
+                    <input id="numero-inventario"
+                           type="number"
+                           min="0"
+                           step="1"
+                           placeholder="Escribe un número"
+                           @bind="_numeroCapturado" />
+                </div>
+
+                <div>
+                    <label for="descripcion">Descripción</label>
+                    <input id="descripcion"
+                           type="text"
+                           maxlength="120"
+                           placeholder="Escribe la descripción del producto"
+                           @bind="_descripcion" />
+                </div>
+            </div>
+
+            <fieldset id="departamentos">
+                <legend>Departamento</legend>
+                <label><input type="radio" name="departamento" value="Frutas" checked="@(_departamento == "Frutas")" @onclick="SeleccionarFrutas" /> Frutas</label>
+                <label><input type="radio" name="departamento" value="Verduras" checked="@(_departamento == "Verduras")" @onclick="SeleccionarVerduras" /> Verduras</label>
+                <label><input type="radio" name="departamento" value="Lácteos" checked="@(_departamento == "Lácteos")" @onclick="SeleccionarLacteos" /> Lácteos</label>
+            </fieldset>
+
+            <div id="botones">
+                <button type="button" @onclick="GuardarDatos">Guardar datos</button>
+                <button type="button" @onclick="MostrarListaCompleta">Lista completa</button>
+                <button type="button" @onclick="MostrarFrutas">Lista de frutas</button>
+                <button type="button" @onclick="MostrarVerduras">Lista de verduras</button>
+                <button type="button" @onclick="MostrarLacteos">Lista de lácteos</button>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(_mensaje))
+            {
+                <p id="mensaje" role="@(_esError ? "alert" : "status")" style="@EstiloMensaje">@_mensaje</p>
+            }
+        </section>
+
+        @if (_mostrarLista)
+        {
+            <section id="lista" aria-labelledby="titulo-lista">
+                <div id="encabezado-lista">
+                    <div>
+                        <h2 id="titulo-lista">@TituloLista</h2>
+                        <p>@ContarProductosVisibles() producto(s)</p>
+                    </div>
+                </div>
+
+                <div id="contenedor-tabla">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No. Inventario</th>
+                                <th>Descripción</th>
+                                <th>Departamento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ContarProductosVisibles() == 0)
+                            {
+                                <tr>
+                                    <td colspan="3">No hay productos en esta lista.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @for (int i = 0; i < _numerosInventario.Count; i++)
+                                {
+                                    @if (EsVisible(i))
+                                    {
+                                        <tr>
+                                            <td>@_numerosInventario[i]</td>
+                                            <td>@_descripciones[i]</td>
+                                            <td>@_departamentosGuardados[i]</td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <button id="cerrar-lista" type="button" @onclick="CerrarLista">Cerrar lista</button>
+            </section>
+        }
+    </main>
+</div>
+
+<style>
+    #aplicacion {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        background: #f4f6fa;
+        color: #1f2937;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #barra-lateral {
+        padding: 24px 16px;
+        background: #172554;
+        color: #ffffff;
+    }
+
+    #nombre-aplicacion {
+        margin: 0 0 34px;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    #barra-lateral nav div,
+    #barra-lateral nav button {
+        box-sizing: border-box;
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: #dbeafe;
+        font: inherit;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    #barra-lateral nav button {
+        cursor: pointer;
+    }
+
+    #barra-lateral nav #opcion-activa {
+        background: #263b70;
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    #barra-lateral nav button:hover {
+        background: #263b70;
+        color: #ffffff;
+    }
+
+    #contenido {
+        width: min(100%, 1050px);
+        box-sizing: border-box;
+        margin: 0 auto;
+        padding: 38px;
+    }
+
+    #sobre-titulo {
+        margin: 0 0 8px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    h1 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 30px;
+    }
+
+    #introduccion {
+        margin: 10px 0 26px;
+        color: #64748b;
+    }
+
+    #formulario, #lista {
+        margin-bottom: 22px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #ffffff;
+        box-shadow: 0 4px 14px #0f172a0a;
+    }
+
+    h2 {
+        margin: 0 0 18px;
+        color: #0f172a;
+        font-size: 19px;
+    }
+
+    #campos {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 18px;
+    }
+
+        #campos label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        #campos input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: #ffffff;
+            color: #0f172a;
+            font: inherit;
+        }
+
+            #campos input:focus {
+                border-color: #2563eb;
+                outline: 2px solid #bfdbfe;
+            }
+
+    #departamentos {
+        margin: 20px 0;
+        padding: 0;
+        border: 0;
+    }
+
+        #departamentos legend {
+            margin-bottom: 9px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        #departamentos label {
+            margin-right: 18px;
+            color: #334155;
+            font-size: 14px;
+        }
+
+    #botones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    button {
+        padding: 10px 13px;
+        border: 0;
+        border-radius: 7px;
+        background: #16a34a;
+        color: #ffffff;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background: #15803d;
+        }
+
+        button:focus-visible {
+            outline: 3px solid #86efac;
+            outline-offset: 2px;
+        }
+
+    #mensaje {
+        margin: 16px 0 0;
+        padding: 11px 13px;
+        border-radius: 7px;
+        font-size: 14px;
+    }
+
+    #encabezado-lista {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        #encabezado-lista h2 {
+            margin-bottom: 4px;
+        }
+
+        #encabezado-lista p {
+            margin: 0 0 16px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+    #contenedor-tabla {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    th, td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 14px;
+    }
+
+    th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 13px;
+    }
+
+    tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+
+    #cerrar-lista {
+        margin-top: 16px;
+        background: #475569;
+    }
+
+        #cerrar-lista:hover {
+            background: #334155;
+        }
+
+    @@media (max-width: 760px) {
+        #aplicacion {
+            grid-template-columns: 1fr;
+        }
+
+        #barra-lateral {
+            padding: 15px 20px;
+        }
+
+        #nombre-aplicacion {
+            margin-bottom: 10px;
+        }
+
+        #barra-lateral nav div,
+        #barra-lateral nav button {
+            display: inline-block;
+            margin: 0 6px 0 0;
+            width: auto;
+        }
+
+        #contenido {
+            padding: 24px 16px;
+        }
+
+        #campos {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@code {
+    // Tres listas paralelas evitan crear una clase de Producto.
+    // Los datos de cada producto comparten la misma posición en las tres listas.
+    private List<int> _numerosInventario = new();
+    private List<string> _descripciones = new();
+    private List<string> _departamentosGuardados = new();
+
+    private string _numeroCapturado = "";
+    private string _descripcion = "";
+    private string _departamento = "Frutas";
+
+    private bool _mostrarLista = false;
+    private string _filtroActual = "";
+    private string _mensaje = "";
+    private bool _esError = false;
+
+    private string TituloLista =>
+        _filtroActual == "" ? "Lista completa" : "Lista de " + _filtroActual.ToLower();
+
+    private string EstiloMensaje =>
+        _esError
+            ? "background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;"
+            : "background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;";
+
+    private void GuardarDatos()
+    {
+        if (!int.TryParse(_numeroCapturado, out int numero) || numero < 0)
+        {
+            MostrarError("Escribe un número de inventario válido (cero o mayor).");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_descripcion))
+        {
+            MostrarError("Escribe la descripción del producto.");
+            return;
+        }
+
+        for (int i = 0; i < _numerosInventario.Count; i++)
+        {
+            if (_numerosInventario[i] == numero)
+            {
+                MostrarError("Ese número de inventario ya está registrado.");
+                return;
+            }
+        }
+
+        _numerosInventario.Add(numero);
+        _descripciones.Add(_descripcion.Trim());
+        _departamentosGuardados.Add(_departamento);
+
+        _numeroCapturado = "";
+        _descripcion = "";
+        _departamento = "Frutas";
+        _mensaje = "Producto guardado correctamente.";
+        _esError = false;
+    }
+
+    private void MostrarListaCompleta()
+    {
+        _filtroActual = "";
+        _mostrarLista = true;
+        _mensaje = "";
+    }
+
+    private void MostrarFrutas()
+    {
+        MostrarListaPorDepartamento("Frutas");
+    }
+
+    private void MostrarVerduras()
+    {
+        MostrarListaPorDepartamento("Verduras");
+    }
+
+    private void MostrarLacteos()
+    {
+        MostrarListaPorDepartamento("Lácteos");
+    }
+
+    private void SeleccionarFrutas()
+    {
+        _departamento = "Frutas";
+    }
+
+    private void SeleccionarVerduras()
+    {
+        _departamento = "Verduras";
+    }
+
+    private void SeleccionarLacteos()
+    {
+        _departamento = "Lácteos";
+    }
+
+    private void MostrarListaPorDepartamento(string departamento)
+    {
+        _filtroActual = departamento;
+        _mostrarLista = true;
+        _mensaje = "";
+    }
+
+    private bool EsVisible(int indice)
+    {
+        return _filtroActual == "" || _departamentosGuardados[indice] == _filtroActual;
+    }
+
+    private int ContarProductosVisibles()
+    {
+        int cantidad = 0;
+
+        for (int i = 0; i < _numerosInventario.Count; i++)
+        {
+            if (EsVisible(i))
+            {
+                cantidad++;
+            }
+        }
+
+        return cantidad;
+    }
+
+    private void CerrarLista()
+    {
+        _mostrarLista = false;
+        _filtroActual = "";
+    }
+
+    private void MostrarError(string texto)
+    {
+        _mensaje = texto;
+        _esError = true;
+    }
+}

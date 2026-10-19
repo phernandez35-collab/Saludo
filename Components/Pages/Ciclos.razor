@@ -1,0 +1,50 @@
+﻿@page "/ciclos"
+@rendermode InteractiveServer
+<h3>Ciclos</h3>
+
+<div class="row mb-3">
+    <div class="col-2">
+        <label class="col-form-label" for="txtNumero">Numero</label>
+    </div>
+    <div class="col-auto">
+        <input class="form-control" id="txtNumero" @bind="numero" @bind:event="oninput" />
+    </div>
+</div>
+<button class="btn btn-primary mb-3" @onclick="Ejecutar">Ejecutar</button>
+
+<div class="row">
+    <div class="col-6">
+        <h4>Tabla de pares</h4>
+        @((MarkupString)pares)
+    </div>
+    <div class="col-6">
+        <h4>Tabla de impares</h4>
+        @((MarkupString)impares)
+    </div>
+</div>
+
+@code {
+    private int numero;
+    private string pares = "";
+    private string impares = "";
+
+    private void Ejecutar()
+    {
+        int contador = 0;
+        pares = "<table class=\"table table-striped\"><tbody>";
+        impares = "<table class=\"table table-striped\"><tbody>";
+
+        while (contador <= numero)
+        {
+            if (contador % 2 == 0)
+                pares += $"<tr><td>{contador}</td></tr>";
+            else
+                impares += $"<tr><td>{contador}</td></tr>";
+
+            contador++;
+        }
+
+        pares += "</tbody></table>";
+        impares += "</tbody></table>";
+    }
+}

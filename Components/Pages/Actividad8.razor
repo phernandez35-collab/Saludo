@@ -1,0 +1,81 @@
+﻿@page "/cambio-moneda"
+@rendermode InteractiveServer
+
+<PageTitle>Cambio de moneda</PageTitle>
+
+<h3>Cambio de moneda</h3>
+
+<div class="row mb-3">
+    <label for="pesos" class="col-sm-2 col-form-label">Pesos</label>
+    <div class="col-sm-10">
+        <input id="pesos" type="number" class="form-control" min="0" step="1" @bind="pesos" />
+    </div>
+</div>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="Convertir">Convertir</button>
+</div>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger">@mensajeError</div>
+}
+
+<div class="row mb-3">
+    <label for="dolares" class="col-sm-2 col-form-label">Dólares</label>
+    <div class="col-sm-10">
+        <input id="dolares" type="text" class="form-control" value="@(dolares.ToString("N2"))" readonly />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <label for="euros" class="col-sm-2 col-form-label">Euros</label>
+    <div class="col-sm-10">
+        <input id="euros" type="text" class="form-control" value="@(euros.ToString("N2"))" readonly />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <label for="libras" class="col-sm-2 col-form-label">Libras</label>
+    <div class="col-sm-10">
+        <input id="libras" type="text" class="form-control" value="@(libras.ToString("N2"))" readonly />
+    </div>
+</div>
+
+@code {
+    // Tipos de cambio constantes: cuántos pesos mexicanos cuesta 1 unidad de cada moneda
+    private const decimal PesosPorDolar = 18.50m;
+    private const decimal PesosPorEuro = 21.50m;
+    private const decimal PesosPorLibra = 24.80m;
+
+    // Cantidad capturada por el usuario
+    private int pesos = 0;
+
+    // Resultados de la conversión
+    private decimal dolares = 0;
+    private decimal euros = 0;
+    private decimal libras = 0;
+
+    // Mensaje de validación
+    private string mensajeError = string.Empty;
+
+    private void Convertir()
+    {
+        // Validar que sea un entero positivo
+        if (pesos <= 0)
+        {
+            dolares = 0;
+            euros = 0;
+            libras = 0;
+            mensajeError = "Ingrese un número entero positivo.";
+            return;
+        }
+
+        mensajeError = string.Empty;
+
+        // Conversión de pesos a cada moneda, redondeada a 2 decimales
+        dolares = Math.Round(pesos / PesosPorDolar, 2);
+        euros = Math.Round(pesos / PesosPorEuro, 2);
+        libras = Math.Round(pesos / PesosPorLibra, 2);
+    }
+}

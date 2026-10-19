@@ -1,0 +1,111 @@
+﻿@page "/dias-del-mes"
+@rendermode InteractiveServer
+
+<PageTitle>Conocer los días del mes</PageTitle>
+
+<h3>Conocer los días del mes</h3>
+
+<div class="row mb-3">
+    <label for="mes" class="col-sm-2 col-form-label">Mes</label>
+    <div class="col-sm-10">
+        <input id="mes" type="number" class="form-control" min="1" max="12" step="1" @bind="mes" />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <label for="anio" class="col-sm-2 col-form-label">Año</label>
+    <div class="col-sm-10">
+        <input id="anio" type="number" class="form-control" min="1" step="1" @bind="anio" />
+    </div>
+</div>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="MostrarDias">Mostrar número de días</button>
+</div>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger">@mensajeError</div>
+}
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <h3>@mensaje</h3>
+}
+
+@code {
+    // Datos capturados por el usuario
+    private int mes = 0;
+    private int anio = 0;
+
+    // Mensaje de resultado y mensaje de validación
+    private string mensaje = string.Empty;
+    private string mensajeError = string.Empty;
+
+    private void MostrarDias()
+    {
+        // Limpiar los mensajes de la vez anterior
+        mensaje = string.Empty;
+        mensajeError = string.Empty;
+
+        // Validar el mes (1 a 12)
+        if (mes < 1 || mes > 12)
+        {
+            mensajeError = "El mes debe ser un número entero entre 1 y 12.";
+            return;
+        }
+
+        // Validar el año (entero positivo)
+        if (anio < 1)
+        {
+            mensajeError = "El año debe ser un número entero positivo.";
+            return;
+        }
+
+        int dias = ObtenerDiasDelMes(mes, anio);
+        mensaje = $"El mes {mes} del año {anio} tiene {dias} días";
+    }
+
+    private int ObtenerDiasDelMes(int numeroMes, int numeroAnio)
+    {
+        switch (numeroMes)
+        {
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
+                return 31;
+
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                return 30;
+
+            case 2:
+                if (EsBisiesto(numeroAnio))
+                {
+                    return 29;
+                }
+                return 28;
+
+            default:
+                return 0; // No ocurre: el mes ya fue validado
+        }
+    }
+
+    // Bisiesto: múltiplo de 4 y no de 100, o múltiplo de 400
+    private bool EsBisiesto(int numeroAnio)
+    {
+        return (numeroAnio % 4 == 0 && numeroAnio % 100 != 0) || numeroAnio % 400 == 0;
+    }
+
+    /// ## Elaborado por:
+    /// 1. Karol Fernanda Gomez Gonzalez
+    /// 2. Pablo Salvador Hernández Hernández
+    /// 3. Fernando Madrigal Martínez
+
+}

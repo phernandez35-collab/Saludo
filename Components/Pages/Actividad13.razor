@@ -1,0 +1,55 @@
+﻿@page "/Actividad13"
+@rendermode InteractiveServer
+
+<h3>Actividades por hacer</h3>
+
+<div class="mb-3">
+    <label for="nuevaActividad" class="form-label">Escribe una actividad:</label>
+    <input id="nuevaActividad"
+           class="form-control"
+           @bind="NuevaActividad"
+           placeholder="Ej. Hacer la tarea" />
+</div>
+
+<button class="btn btn-primary mb-3" @onclick="AgregarActividad">
+    Agregar
+</button>
+
+@if (Actividades.Count == 0)
+{
+    <p>No hay actividades por hacer.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (string actividad in Actividades)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@actividad</span>
+                <button class="btn btn-danger btn-sm"
+                        @onclick="() => EliminarActividad(actividad)">
+                    Eliminar
+                </button>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<string> Actividades = new List<string>();
+    private string NuevaActividad = "";
+
+    private void AgregarActividad()
+    {
+        if (!string.IsNullOrWhiteSpace(NuevaActividad))
+        {
+            Actividades.Add(NuevaActividad.Trim());
+            NuevaActividad = "";
+        }
+    }
+
+    private void EliminarActividad(string actividad)
+    {
+        Actividades.Remove(actividad);
+    }
+}

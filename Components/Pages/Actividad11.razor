@@ -1,0 +1,81 @@
+﻿@page "/lista-de-numeros"
+@rendermode InteractiveServer
+
+<h3>Listas de numeros</h3>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label>Número 1</label>
+        <input type="number" class="form-control" @bind="numero1" />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label>Número 2</label>
+        <input type="number" class="form-control" @bind="numero2" />
+    </div>
+</div>
+
+<button class="btn btn-primary mb-4" @onclick="Calcular">Calcular</button>
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>Pares</h4>
+        @foreach (var par in pares)
+        {
+            <div class="alert alert-secondary p-2 mb-2" role="alert">
+                @par
+            </div>
+        }
+    </div>
+    <div class="col-md-6">
+        <h4>Impares</h4>
+        @foreach (var impar in impares)
+        {
+            <div class="alert alert-secondary p-2 mb-2" role="alert">
+                @impar
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    // Declaración de variables que el equipo debe conocer
+    private int numero1;
+    private int numero2;
+    private List<int> pares = new List<int>();
+    private List<int> impares = new List<int>();
+
+    // Método que se ejecuta al presionar el botón "Calcular"
+    private void Calcular()
+    {
+        // Limpiamos las listas cada vez que se calcula para no acumular resultados anteriores
+        pares.Clear();
+        impares.Clear();
+
+        // Encontramos el número menor y el mayor para poder iterar en orden ascendente
+        int minimo = Math.Min(numero1, numero2);
+        int maximo = Math.Max(numero1, numero2);
+
+        // Ciclo para recorrer desde el número mínimo hasta el máximo (incluyéndolos)[cite: 1]
+        for (int i = minimo; i <= maximo; i++)
+        {
+            // Operación para saber si es par o impar
+            if (i % 2 == 0)
+            {
+                pares.Add(i);
+            }
+            else
+            {
+                impares.Add(i);
+            }
+        }
+    }
+
+    /// ## Elaborado por:
+    /// 1. Karol Fernanda Gomez Gonzalez
+    /// 2. Pablo Salvador Hernández Hernández
+    /// 3. Fernando Madrigal Martínez
+
+}

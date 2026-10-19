@@ -1,0 +1,46 @@
+﻿@page "/ColorEstado"
+@rendermode InteractiveServer
+
+
+<div class="row mb-3">
+    <div class="col-6">
+        <label for="CodigoInput" class="form-label">Ingresa un Codigo:</label>
+        <input id="CodigoInput" type="number" class="form-control" min="0" max="100" @bind="CodigoEstado" />
+    </div>
+</div>
+<button class="btn btn-primary" @onclick="Evaluar">Evaluar Codigo</button>
+<div class="alert @ColorAlerta">
+    <h2>@Mensaje</h2>
+</div>
+
+@code {
+    [Parameter]
+    public string? Mensaje { get; set; } = "Ingresa un Codigo para evaluar";
+
+    private int CodigoEstado;
+    private string ColorAlerta = "alert-info";
+    private void Evaluar()
+    {
+        if (CodigoEstado == 200)
+        {
+            Mensaje = "SISTEMA OPERACIONAL";
+            ColorAlerta = "alert-success";
+        }
+        else if (CodigoEstado == 404)
+        {
+            Mensaje = "RECURSO NO ENCONTRADO";
+            ColorAlerta = "alert-warning";
+        }
+        else if (CodigoEstado == 500)
+        {
+            Mensaje = $"ERROR INTERNO DEL SERVIDOR";
+            ColorAlerta = "alert-danger";
+        }
+        else
+        {
+            Mensaje = $"CODIGO DESCONOCIDO";
+            ColorAlerta = "alert-secondary";
+        }
+    }
+    //Aleixs Emmanuel Cobian Morales
+}

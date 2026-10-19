@@ -1,0 +1,163 @@
+﻿@page "/Actividad14"
+@rendermode InteractiveServer
+
+<h3>Administrar canciones</h3>
+
+<div class="mb-3">
+    <label for="titulo">Título de la canción:</label>
+    <input id="titulo" class="form-control" @bind="titulo" />
+</div>
+
+@if (indiceEdicion == -1)
+{
+    <button class="btn btn-primary mb-3" @onclick="Agregar">Agregar</button>
+}
+else
+{
+    <button class="btn btn-success mb-3" @onclick="GuardarCambios">Guardar cambios</button>
+    <button class="btn btn-secondary mb-3" @onclick="CancelarEdicion">Cancelar</button>
+}
+
+<div class="mb-3">
+    <label for="filtro">Filtrar canciones:</label>
+    <input id="filtro" class="form-control" @bind="filtro" @bind:event="oninput"
+           placeholder="Ejemplo: summer" />
+</div>
+
+<div class="mb-3">
+    <label for="orden">Orden alfabético:</label>
+    <select id="orden" class="form-select" @bind="orden">
+        <option value="asc">Ascendente (A-Z)</option>
+        <option value="desc">Descendente (Z-A)</option>
+    </select>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(mensaje))
+{
+    <p>@mensaje</p>
+}
+
+<h4>Lista de canciones</h4>
+
+@if (CancionesVisibles.Count == 0)
+{
+    <p>No hay canciones que coincidan con el filtro.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var cancion in CancionesVisibles)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@cancion</span>
+                <span>
+                    <button class="btn btn-sm btn-warning me-2" @onclick="() => Editar(cancion)">Editar</button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => Eliminar(cancion)">Eliminar</button>
+                </span>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<string> canciones = new List<string>
+    {
+        "Summer Nights",
+        "Yellow",
+        "Imagine",
+        "Here Comes the Sun"
+    };
+
+    private string titulo = "";
+    private string filtro = "";
+    private string orden = "asc";
+    private string mensaje = "";
+    private int indiceEdicion = -1;
+
+    private List<string> CancionesVisibles
+    {
+        get
+        {
+            IEnumerable<string> resultado = canciones;
+
+            if (!string.IsNullOrWhiteSpace(filtro))
+            {
+                resultado = resultado.Where(c =>
+                    c.Contains(filtro, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (orden == "asc")
+            {
+                resultado = resultado.OrderBy(c => c);
+            }
+            else
+            {
+                resultado = resultado.OrderByDescending(c => c);
+            }
+
+            return resultado.ToList();
+        }
+    }
+
+    private void Agregar()
+    {
+        if (string.IsNullOrWhiteSpace(titulo))
+        {
+            mensaje = "Escribe un título antes de agregar.";
+            return;
+        }
+
+        canciones.Add(titulo.Trim());
+        titulo = "";
+        mensaje = "Canción agregada.";
+    }
+
+    private void Editar(string cancion)
+    {
+        indiceEdicion = canciones.IndexOf(cancion);
+        titulo = cancion;
+        mensaje = "";
+    }
+
+    private void GuardarCambios()
+    {
+        if (string.IsNullOrWhiteSpace(titulo))
+        {
+            mensaje = "El título no puede estar vacío.";
+            return;
+        }
+
+        if (indiceEdicion >= 0 && indiceEdicion < canciones.Count)
+        {
+            canciones[indiceEdicion] = titulo.Trim();
+        }
+
+        titulo = "";
+        indiceEdicion = -1;
+        mensaje = "Cambios guardados.";
+    }
+
+    private void CancelarEdicion()
+    {
+        titulo = "";
+        indiceEdicion = -1;
+        mensaje = "";
+    }
+
+    private void Eliminar(string cancion)
+    {
+        canciones.Remove(cancion);
+        mensaje = "Canción eliminada.";
+
+        if (indiceEdicion >= canciones.Count)
+        {
+            CancelarEdicion();
+        }
+    }
+
+    /// ## Elaborado por:
+    /// 1. Karol Fernanda Gomez Gonzalez
+    /// 2. Pablo Salvador Hernández Hernández
+    /// 3. Fernando Madrigal Martínez
+
+}

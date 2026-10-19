@@ -1,0 +1,67 @@
+﻿@page "/numeros-primos"
+@rendermode InteractiveServer
+
+<h3>Numeros primos</h3>
+
+<div class="row mb-3 mt-3">
+    <div class="col-md-4 d-flex align-items-center">
+        <label class="me-2 text-muted">Número entero</label>
+        <input type="number" class="form-control" @bind="numeroIngresado" />
+    </div>
+</div>
+
+<button class="btn btn-primary mb-4" @onclick="GenerarPrimos">Generar primos</button>
+
+<h4>Números primos</h4>
+
+@if (listaPrimos != null && listaPrimos.Count > 0)
+{
+    <ul class="list-group col-md-4">
+        @foreach (var primo in listaPrimos)
+        {
+            <li class="list-group-item bg-light border-0 border-bottom">@primo</li>
+        }
+    </ul>
+}
+
+@code {
+    // Variables conocidas y sencillas de entender
+    private int numeroIngresado = 10;
+    private List<int> listaPrimos = new List<int>();
+
+    // Método que se activa con el botón
+    private void GenerarPrimos()
+    {
+        listaPrimos.Clear(); // Limpiamos la lista antes de generar nuevos
+
+        // El número 1 no es primo, empezamos desde el 2 hasta el número ingresado
+        for (int i = 2; i <= numeroIngresado; i++)
+        {
+            if (EsPrimo(i))
+            {
+                listaPrimos.Add(i);
+            }
+        }
+    }
+
+    // Método auxiliar para saber si un número individual es primo
+    private bool EsPrimo(int numero)
+    {
+        if (numero < 2) return false;
+
+        for (int i = 2; i < numero; i++)
+        {
+            if (numero % i == 0) // Si es divisible por cualquier otro número, no es primo
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /// ## Elaborado por:
+    /// 1. Karol Fernanda Gomez Gonzalez
+    /// 2. Pablo Salvador Hernández Hernández
+    /// 3. Fernando Madrigal Martínez
+
+}
